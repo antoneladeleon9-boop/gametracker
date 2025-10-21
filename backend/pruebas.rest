@@ -1,0 +1,34 @@
+### 📋 OBTENER TODOS LOS JUEGOS
+GET http://localhost:5000/juegos
+
+###
+
+### ➕ AGREGAR UN NUEVO JUEGO
+POST http://localhost:5000/juegos
+Content-Type: application/json
+
+{
+  "titulo": "The Legend of Zelda: Breath of the Wild",
+  "plataforma": "Nintendo Switch",
+  "genero": "Aventura",
+  "horasJugadas": 120,
+  "completado": true,
+  "puntuacion": 5,
+  "portada": "https://upload.wikimedia.org/wikipedia/en/0/0b/The_Legend_of_Zelda_Breath_of_the_Wild.jpg"
+}
+
+###
+
+### ✏️ EDITAR UN JUEGO (cambia el ID por uno real)
+PUT http://localhost:5000/juegos/ID_DEL_JUEGO
+Content-Type: application/json
+
+{
+  "puntuacion": 4,
+  "horasJugadas": 150
+}
+
+###
+
+### 🗑️ ELIMINAR UN JUEGO (cambia el ID por uno real)
+DELETE http://localhost:5000/juegos/ID_DEL_JUEGO
