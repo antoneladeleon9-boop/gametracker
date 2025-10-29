@@ -1,15 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function FormularioJuego({ onAgregar }) {
+export default function FormularioJuego({ onAgregar, onEditar, juegoEditando }) {
   const [titulo, setTitulo] = useState("");
   const [plataforma, setPlataforma] = useState("");
   const [genero, setGenero] = useState("");
   const [portada, setPortada] = useState("");
 
+  useEffect(() => {
+    if (juegoEditando) {
+      setTitulo(juegoEditando.titulo);
+      setPlataforma(juegoEditando.plataforma);
+      setGenero(juegoEditando.genero);
+      setPortada(juegoEditando.portada);
+    } else {
+      setTitulo("");
+      setPlataforma("");
+      setGenero("");
+      setPortada("");
+    }
+  }, [juegoEditando]);
+
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!titulo || !plataforma || !genero || !portada) return;
-    onAgregar({ titulo, plataforma, genero, portada });
+
+    const nuevoJuego = {
+      _id: juegoEditando?._id,
+      titulo,
+      plataforma,
+      genero,
+      portada,
+    };
+
+    if (juegoEditando) {
+      onEditar(nuevoJuego);
+    } else {
+      onAgregar(nuevoJuego);
+    }
+
     setTitulo("");
     setPlataforma("");
     setGenero("");
@@ -18,7 +46,7 @@ export default function FormularioJuego({ onAgregar }) {
 
   return (
     <form className="formulario-juego" onSubmit={manejarEnvio}>
-      <h2>🎮 Agregar nuevo juego</h2>
+      <h2>{juegoEditando ? "✏️ Editar juego" : "🎮 Agregar nuevo juego"}</h2>
       <input
         type="text"
         placeholder="Título"
@@ -43,7 +71,7 @@ export default function FormularioJuego({ onAgregar }) {
         value={portada}
         onChange={(e) => setPortada(e.target.value)}
       />
-      <button type="submit">Agregar</button>
+      <button type="submit">{juegoEditando ? "Guardar cambios" : "Agregar"}</button>
     </form>
   );
 }

@@ -1,4 +1,4 @@
-export default function TarjetaJuego({ juego, onEliminar }) {
+export default function TarjetaJuego({ juego, onEliminar, onEditar }) {
   return (
     <div className="tarjeta-juego">
       <img src={juego.portada} alt={juego.titulo} />
@@ -10,6 +10,9 @@ export default function TarjetaJuego({ juego, onEliminar }) {
       <p><strong>Puntuación:</strong> {"⭐".repeat(juego.puntuacion || 0)}</p>
 
       <div className="botones">
+        <button className="btn-editar" onClick={() => onEditar(juego)}>
+           Editar
+        </button>
         <button className="btn-eliminar" onClick={() => onEliminar(juego._id)}>
            Eliminar
         </button>

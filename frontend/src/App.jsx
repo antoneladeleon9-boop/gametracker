@@ -5,8 +5,9 @@ import "./App.css";
 
 export default function App() {
   const [juegos, setJuegos] = useState([]);
+  const [juegoEditando, setJuegoEditando] = useState(null);
 
-  // 🔹 Cargar juegos desde el backend
+  // 🔹 Cargar juegos
   useEffect(() => {
     const cargarJuegos = async () => {
       try {
@@ -20,7 +21,7 @@ export default function App() {
     cargarJuegos();
   }, []);
 
-  // 🔹 Agregar un nuevo juego
+  // 🔹 Agregar juego
   const agregarJuego = async (nuevoJuego) => {
     try {
       const respuesta = await fetch("http://localhost:5000/api/juegos", {
@@ -35,7 +36,7 @@ export default function App() {
     }
   };
 
-  // 🔹 Eliminar un juego
+  // 🔹 Eliminar juego
   const eliminarJuego = async (id) => {
     try {
       await fetch(`http://localhost:5000/api/juegos/${id}`, { method: "DELETE" });
@@ -45,19 +46,49 @@ export default function App() {
     }
   };
 
+  // 🔹 Editar juego (actualizar)
+  const editarJuego = async (juegoActualizado) => {
+    try {
+      const respuesta = await fetch(
+        `http://localhost:5000/api/juegos/${juegoActualizado._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(juegoActualizado),
+        }
+      );
+      const datos = await respuesta.json();
+      setJuegos(
+        juegos.map((j) => (j._id === datos.juego._id ? datos.juego : j))
+      );
+      setJuegoEditando(null);
+    } catch (error) {
+      console.error("Error al editar juego:", error);
+    }
+  };
+
   return (
     <div className="contenedor">
       <h1>🎮 Seguimiento del juego</h1>
       <p>Tu biblioteca gamer personalizada</p>
 
-      <FormularioJuego onAgregar={agregarJuego} />
+      <FormularioJuego
+        onAgregar={agregarJuego}
+        onEditar={editarJuego}
+        juegoEditando={juegoEditando}
+      />
 
       <div className="lista-juegos">
         {juegos.length === 0 ? (
           <p>No hay juegos registrados aún.</p>
         ) : (
           juegos.map((juego) => (
-            <TarjetaJuego key={juego._id} juego={juego} onEliminar={eliminarJuego} />
+            <TarjetaJuego
+              key={juego._id}
+              juego={juego}
+              onEliminar={eliminarJuego}
+              onEditar={setJuegoEditando}
+            />
           ))
         )}
       </div>
