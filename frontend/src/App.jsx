@@ -1,117 +1,66 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import FormularioJuego from "./components/FormularioJuego";
 import TarjetaJuego from "./components/TarjetaJuego";
+import "./App.css";
 
-function App() {
+export default function App() {
   const [juegos, setJuegos] = useState([]);
-  const [nuevoJuego, setNuevoJuego] = useState({
-    titulo: "",
-    plataforma: "",
-    genero: "",
-    completado: false,
-    puntuacion: 0,
-    portada: ""
-  });
 
-  // 🔹 1. Cargar los juegos al iniciar
+  // 🔹 Cargar juegos desde el backend
   useEffect(() => {
-    obtenerJuegos();
+    const cargarJuegos = async () => {
+      try {
+        const respuesta = await fetch("http://localhost:5000/api/juegos");
+        const datos = await respuesta.json();
+        setJuegos(datos);
+      } catch (error) {
+        console.error("Error al cargar juegos:", error);
+      }
+    };
+    cargarJuegos();
   }, []);
 
-  const obtenerJuegos = () => {
-    axios
-      .get("http://localhost:5000/juegos")
-      .then((res) => setJuegos(res.data))
-      .catch((err) => console.error("Error al obtener juegos:", err));
+  // 🔹 Agregar un nuevo juego
+  const agregarJuego = async (nuevoJuego) => {
+    try {
+      const respuesta = await fetch("http://localhost:5000/api/juegos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoJuego),
+      });
+      const datos = await respuesta.json();
+      setJuegos([...juegos, datos.juego]);
+    } catch (error) {
+      console.error("Error al agregar juego:", error);
+    }
   };
 
- const guardarJuego = (e) => {
-  e.preventDefault(); // evita que la página se recargue
-
-  axios
-    .post("http://localhost:5000/juegos", nuevoJuego)
-    .then(() => {
-      alert("🎮 Juego agregado con éxito");
-      setNuevoJuego({
-        titulo: "",
-        plataforma: "",
-        genero: "",
-        completado: false,
-        puntuacion: 0,
-        portada: ""
-      });
-      obtenerJuegos(); // recargar lista
-    })
-    .catch((err) => console.error("Error al agregar juego:", err));
-};
-
-
-  const eliminarJuego = (id) => {
-    axios
-      .delete(`http://localhost:5000/juegos/${id}`)
-      .then(() => obtenerJuegos())
-      .catch((err) => console.error("Error al eliminar juego:", err));
+  // 🔹 Eliminar un juego
+  const eliminarJuego = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/api/juegos/${id}`, { method: "DELETE" });
+      setJuegos(juegos.filter((juego) => juego._id !== id));
+    } catch (error) {
+      console.error("Error al eliminar juego:", error);
+    }
   };
 
   return (
     <div className="contenedor">
       <h1>🎮 Seguimiento del juego</h1>
+      <p>Tu biblioteca gamer personalizada</p>
 
-      {/* Formulario */}
-      <form onSubmit={guardarJuego}>
-        <input
-          type="text"
-          placeholder="Título"
-          value={nuevoJuego.titulo}
-          onChange={(e) =>
-            setNuevoJuego({ ...nuevoJuego, titulo: e.target.value })
-          }
-          required
-        />
-        <input
-          type="text"
-          placeholder="Plataforma"
-          value={nuevoJuego.plataforma}
-          onChange={(e) =>
-            setNuevoJuego({ ...nuevoJuego, plataforma: e.target.value })
-          }
-          required
-        />
-        <input
-          type="text"
-          placeholder="Género"
-          value={nuevoJuego.genero}
-          onChange={(e) =>
-            setNuevoJuego({ ...nuevoJuego, genero: e.target.value })
-          }
-          required
-        />
-        <input
-          type="text"
-          placeholder="URL de la portada"
-          value={nuevoJuego.portada}
-          onChange={(e) =>
-            setNuevoJuego({ ...nuevoJuego, portada: e.target.value })
-          }
-        />
-        <button type="submit">Agregar</button>
-      </form>
+      <FormularioJuego onAgregar={agregarJuego} />
 
-      {/* Lista de juegos */}
-      {juegos.length === 0 ? (
-        <p>No hay juegos registrados aún.</p>
-      ) : (
-        juegos.map((juego) => (
-          <TarjetaJuego
-            key={juego._id}
-            juego={juego}
-            onEliminar={eliminarJuego}
-            onEditar={() => {}}
-          />
-        ))
-      )}
+      <div className="lista-juegos">
+        {juegos.length === 0 ? (
+          <p>No hay juegos registrados aún.</p>
+        ) : (
+          juegos.map((juego) => (
+            <TarjetaJuego key={juego._id} juego={juego} onEliminar={eliminarJuego} />
+          ))
+        )}
+      </div>
     </div>
   );
 }
-
-export default App;

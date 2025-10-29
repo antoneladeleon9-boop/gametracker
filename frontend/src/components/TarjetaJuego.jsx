@@ -1,37 +1,19 @@
-function TarjetaJuego({ juego, onEliminar, onEditar }) {
+export default function TarjetaJuego({ juego, onEliminar }) {
   return (
-    <div className={`tarjeta ${juego.completado ? "completado" : ""}`}>
-      {/* Imagen del juego */}
-      {juego.portada && (
-        <img
-          src={juego.portada}
-          alt={juego.titulo}
-          style={{
-            width: "100%",
-            maxHeight: "200px",
-            objectFit: "cover",
-            borderRadius: "8px",
-            marginBottom: "10px",
-          }}
-        />
-      )}
-
-      {/* Información */}
+    <div className="tarjeta-juego">
+      <img src={juego.portada} alt={juego.titulo} />
       <h3>{juego.titulo}</h3>
       <p><strong>Plataforma:</strong> {juego.plataforma}</p>
       <p><strong>Género:</strong> {juego.genero}</p>
-      {juego.horasJugadas && (
-        <p><strong>Horas jugadas:</strong> {juego.horasJugadas}</p>
-      )}
-      <p><strong>Completado:</strong> {juego.completado ? "✅ Sí" : "❌ No"}</p>
-      <p><strong>Puntuación:</strong> {"⭐".repeat(juego.puntuacion)}</p>
+      <p><strong>Horas jugadas:</strong> {juego.horasJugadas || 0}</p>
+      <p><strong>Completado:</strong> {juego.completado ? " Sí" : " No"}</p>
+      <p><strong>Puntuación:</strong> {"⭐".repeat(juego.puntuacion || 0)}</p>
 
-      <div className="acciones">
-        <button onClick={() => onEditar(juego)}>✏️ Editar</button>
-        <button onClick={() => onEliminar(juego._id)}>🗑️ Eliminar</button>
+      <div className="botones">
+        <button className="btn-eliminar" onClick={() => onEliminar(juego._id)}>
+           Eliminar
+        </button>
       </div>
     </div>
   );
 }
-
-export default TarjetaJuego;

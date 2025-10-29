@@ -1,45 +1,49 @@
 import { useState } from "react";
 
-function FormularioJuego({ onAgregar }) {
-  const [juego, setJuego] = useState({
-    titulo: "",
-    plataforma: "",
-    genero: "",
-  });
+export default function FormularioJuego({ onAgregar }) {
+  const [titulo, setTitulo] = useState("");
+  const [plataforma, setPlataforma] = useState("");
+  const [genero, setGenero] = useState("");
+  const [portada, setPortada] = useState("");
 
   const manejarEnvio = (e) => {
     e.preventDefault();
-    if (!juego.titulo || !juego.plataforma || !juego.genero) {
-      alert("Por favor completa todos los campos");
-      return;
-    }
-    onAgregar(juego);
-    setJuego({ titulo: "", plataforma: "", genero: "" });
+    if (!titulo || !plataforma || !genero || !portada) return;
+    onAgregar({ titulo, plataforma, genero, portada });
+    setTitulo("");
+    setPlataforma("");
+    setGenero("");
+    setPortada("");
   };
 
   return (
-    <form onSubmit={manejarEnvio} className="formulario">
+    <form className="formulario-juego" onSubmit={manejarEnvio}>
+      <h2>🎮 Agregar nuevo juego</h2>
       <input
         type="text"
         placeholder="Título"
-        value={juego.titulo}
-        onChange={(e) => setJuego({ ...juego, titulo: e.target.value })}
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
       />
       <input
         type="text"
         placeholder="Plataforma"
-        value={juego.plataforma}
-        onChange={(e) => setJuego({ ...juego, plataforma: e.target.value })}
+        value={plataforma}
+        onChange={(e) => setPlataforma(e.target.value)}
       />
       <input
         type="text"
         placeholder="Género"
-        value={juego.genero}
-        onChange={(e) => setJuego({ ...juego, genero: e.target.value })}
+        value={genero}
+        onChange={(e) => setGenero(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="URL de la portada"
+        value={portada}
+        onChange={(e) => setPortada(e.target.value)}
       />
       <button type="submit">Agregar</button>
     </form>
   );
 }
-
-export default FormularioJuego;

@@ -1,35 +1,20 @@
-console.log("🟢 Iniciando servidor GameTracker...");
-
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import juegosRoutes from "./routes/juegos.js";
+import juegosRouter from "./routes/juegos.js";
 
 dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Rutas
-app.use("/juegos", juegosRoutes);
+app.use("/api/juegos", juegosRouter);
 
-// Conexión a MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ Conectado a MongoDB Atlas");
+    app.listen(5000, () => console.log("🟢 Servidor corriendo en puerto 5000"));
+  })
   .catch((err) => console.error("❌ Error al conectar MongoDB:", err));
-
-// Ruta base de prueba
-app.get("/", (req, res) => {
-  res.send("🚀 Servidor GameTracker funcionando correctamente");
-});
-
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-});
