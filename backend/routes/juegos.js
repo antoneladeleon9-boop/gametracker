@@ -1,50 +1,49 @@
 import express from "express";
 import Juego from "../models/Juego.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ✅ Obtener todos los juegos
-router.get("/", async (req, res) => {
+// 🟢 Obtener todos los juegos del usuario autenticado
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const juegos = await Juego.find();
+    const juegos = await Juego.find({ usuario: req.usuario.id });
     res.json(juegos);
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al obtener los juegos", error });
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al obtener los juegos" });
   }
 });
 
-// ✅ Agregar un nuevo juego
-router.post("/", async (req, res) => {
+// 🟢 Agregar un nuevo juego al usuario autenticado
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const nuevoJuego = new Juego(req.body);
-    await nuevoJuego.save();
-    res.json({ mensaje: "Juego agregado con éxito", juego: nuevoJuego });
-  } catch (error) {
-    res.status(500).json({ mensaje: "Error al agregar el juego", error });
-  }
-});
-
-// ✅ Editar un juego
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const juegoActualizado = await Juego.findByIdAndUpdate(id, req.body, {
-      new: true,
+    const nuevoJuego = new Juego({
+      ...req.body,
+      usuario: req.usuario.id,
     });
-    res.json({ mensaje: "Juego actualizado", juego: juegoActualizado });
+    await nuevoJuego.save();
+    res.status(201).json(nuevoJuego);
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al actualizar el juego", error });
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al agregar el juego" });
   }
 });
 
-// ✅ Eliminar un juego
-router.delete("/:id", async (req, res) => {
+// 🟢 Eliminar un juego del usuario autenticado
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-    await Juego.findByIdAndDelete(id);
-    res.json({ mensaje: "Juego eliminado con éxito" });
+    const juego = await Juego.findOneAndDelete({
+      _id: req.params.id,
+      usuario: req.usuario.id,
+    });
+    if (!juego) {
+      return res.status(404).json({ mensaje: "Juego no encontrado" });
+    }
+    res.json({ mensaje: "Juego eliminado correctamente" });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al eliminar el juego", error });
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al eliminar el juego" });
   }
 });
 

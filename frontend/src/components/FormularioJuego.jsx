@@ -46,7 +46,7 @@ export default function FormularioJuego({ onAgregar, onEditar, juegoEditando }) 
 
   return (
     <form className="formulario-juego" onSubmit={manejarEnvio}>
-      <h2>{juegoEditando ? "✏️ Editar juego" : "🎮 Agregar nuevo juego"}</h2>
+      <h2>{juegoEditando ? "✏️ Editar juego" : "Agregar nuevo juego"}</h2>
       <input
         type="text"
         placeholder="Título"

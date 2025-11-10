@@ -66,3 +66,41 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+/* Centrar todo el contenido */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;   /* centra horizontalmente */
+  align-items: center;       /* centra verticalmente */
+  min-height: 100vh;         /* ocupa toda la pantalla */
+  background-color: #0f0f0f; /* color de fondo oscuro */
+}
+
+/* Contenedor principal de la app */
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+/* Lista de juegos centrada */
+.game-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Cuadro del formulario */
+form {
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  width: 100%;
+  max-width: 500px;
+}

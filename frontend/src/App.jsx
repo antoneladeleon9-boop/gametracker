@@ -1,36 +1,45 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import LoginRegistro from "./components/LoginRegistro";
 import FormularioJuego from "./components/FormularioJuego";
 import TarjetaJuego from "./components/TarjetaJuego";
 import "./App.css";
 
 export default function App() {
+  const { usuario, token, logout } = useContext(AuthContext);
   const [juegos, setJuegos] = useState([]);
   const [juegoEditando, setJuegoEditando] = useState(null);
 
-  // 🔹 Cargar juegos
+  // 🔹 Cargar juegos del usuario logueado
   useEffect(() => {
+    if (!token) return;
     const cargarJuegos = async () => {
       try {
-        const respuesta = await fetch("http://localhost:5000/api/juegos");
-        const datos = await respuesta.json();
-        setJuegos(datos);
+        const res = await fetch("http://localhost:5000/api/juegos", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setJuegos(data);
       } catch (error) {
         console.error("Error al cargar juegos:", error);
       }
     };
     cargarJuegos();
-  }, []);
+  }, [token]);
 
   // 🔹 Agregar juego
   const agregarJuego = async (nuevoJuego) => {
     try {
-      const respuesta = await fetch("http://localhost:5000/api/juegos", {
+      const res = await fetch("http://localhost:5000/api/juegos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(nuevoJuego),
       });
-      const datos = await respuesta.json();
-      setJuegos([...juegos, datos.juego]);
+      const data = await res.json();
+      setJuegos([...juegos, data.juego]);
     } catch (error) {
       console.error("Error al agregar juego:", error);
     }
@@ -39,27 +48,33 @@ export default function App() {
   // 🔹 Eliminar juego
   const eliminarJuego = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/juegos/${id}`, { method: "DELETE" });
-      setJuegos(juegos.filter((juego) => juego._id !== id));
+      await fetch(`http://localhost:5000/api/juegos/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setJuegos(juegos.filter((j) => j._id !== id));
     } catch (error) {
       console.error("Error al eliminar juego:", error);
     }
   };
 
-  // 🔹 Editar juego (actualizar)
+  // 🔹 Editar juego
   const editarJuego = async (juegoActualizado) => {
     try {
-      const respuesta = await fetch(
+      const res = await fetch(
         `http://localhost:5000/api/juegos/${juegoActualizado._id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(juegoActualizado),
         }
       );
-      const datos = await respuesta.json();
+      const data = await res.json();
       setJuegos(
-        juegos.map((j) => (j._id === datos.juego._id ? datos.juego : j))
+        juegos.map((j) => (j._id === data.juego._id ? data.juego : j))
       );
       setJuegoEditando(null);
     } catch (error) {
@@ -67,10 +82,20 @@ export default function App() {
     }
   };
 
+  if (!usuario)
+    return (
+      <div className="contenedor">
+        <LoginRegistro />
+      </div>
+    );
+
   return (
     <div className="contenedor">
-      <h1>🎮 Seguimiento del juego</h1>
-      <p>Tu biblioteca gamer personalizada</p>
+      <h1>🎮 GameTracker</h1>
+      <p>Bienvenido, {usuario.nombre}</p>
+      <button className="logout" onClick={logout}>
+        Cerrar sesión
+      </button>
 
       <FormularioJuego
         onAgregar={agregarJuego}

@@ -1,34 +1,53 @@
-### 📋 OBTENER TODOS LOS JUEGOS
-GET http://localhost:5000/juegos
+@baseUrl = http://localhost:5000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGI2NjJlYzk5MWU5NGQ4MTE0MjU4YSIsIm5vbWJyZSI6IkFudG9uZWxhIiwiaWF0IjoxNzYyNzI2MTkzLCJleHAiOjE3NjMzMzA5OTN9.cjqk9bnsLZ968GNVzeDf7yVQtJ3ghJYQs2EEni9wrdQ
 
-###
-
-### ➕ AGREGAR UN NUEVO JUEGO
-POST http://localhost:5000/juegos
+### 🔹 REGISTRAR NUEVO USUARIO
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "titulo": "The Legend of Zelda: Breath of the Wild",
-  "plataforma": "Nintendo Switch",
-  "genero": "Aventura",
-  "horasJugadas": 120,
-  "completado": true,
-  "puntuacion": 5,
-  "portada": "https://upload.wikimedia.org/wikipedia/en/0/0b/The_Legend_of_Zelda_Breath_of_the_Wild.jpg"
+  "nombre": "Antonela",
+  "email": "antonela@example.com",
+  "password": "123456"
 }
 
 ###
 
-### ✏️ EDITAR UN JUEGO (cambia el ID por uno real)
-PUT http://localhost:5000/juegos/ID_DEL_JUEGO
+### 🔹 INICIAR SESIÓN (LOGIN)
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "puntuacion": 4,
-  "horasJugadas": 150
+  "email": "antonela@example.com",
+  "password": "123456"
 }
 
 ###
 
-### 🗑️ ELIMINAR UN JUEGO (cambia el ID por uno real)
-DELETE http://localhost:5000/juegos/ID_DEL_JUEGO
+### 🔹 OBTENER TODOS LOS JUEGOS (ruta protegida)
+GET {{baseUrl}}/juegos
+Authorization: Bearer {{token}}
+
+###
+
+### 🔹 AGREGAR NUEVO JUEGO (ruta protegida)
+POST {{baseUrl}}/juegos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "titulo": "The Witcher 3: Wild Hunt",
+  "genero": "RPG / Aventura",
+  "plataforma": "PC / PS4 / Xbox One / Switch",
+  "añoLanzamiento": 2015,
+  "desarrollador": "CD Projekt Red",
+  "imagenPortada": "https://upload.wikimedia.org/wikipedia/en/0/0c/Witcher_3_cover_art.jpg",
+  "descripcion": "Un juego de rol de mundo abierto con una historia épica.",
+  "completado": false
+}
+
+###
+
+### 🔹 OBTENER DATOS DEL USUARIO ACTUAL
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
