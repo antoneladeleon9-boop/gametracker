@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
   const { registrar } = useAuth();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const manejarSubmit = async (e) => {
     e.preventDefault();
     const ok = await registrar(nombre, email, password);
-
-    if (ok) window.location.href = "/";
+    if (ok) navigate("/inicio");
   };
 
   return (
@@ -48,7 +49,7 @@ export default function Register() {
 
       <p>
         ¿Ya tenés cuenta?{" "}
-        <a href="/" style={{ color: "#4caf50" }}>Iniciar sesión</a>
+        <Link to="/" style={{ color: "#4caf50" }}>Iniciar sesión</Link>
       </p>
     </div>
   );

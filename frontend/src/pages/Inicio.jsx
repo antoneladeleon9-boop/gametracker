@@ -27,20 +27,34 @@ export default function Inicio() {
       </button>
 
       <FormularioJuego
-        onAgregar={async (j) => {
-          const res = await fetch("http://localhost:5000/api/juegos", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(j),
-          });
-          const data = await res.json();
-          setJuegos([...juegos, data.juego]);
+        onAgregar={async (juegoNuevo) => {
+          try {
+            const res = await fetch("http://localhost:5000/api/juegos", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(juegoNuevo),
+            });
+            const data = await res.json();
+
+            // Actualiza el estado usando función para evitar problemas
+            setJuegos(prevJuegos => [...prevJuegos, data]);
+          } catch (error) {
+            console.error("Error al agregar juego:", error);
+          }
         }}
       />
 
       <div className="lista-juegos">
         {juegos.map((juego) => (
-          <TarjetaJuego key={juego._id} juego={juego} />
+          <TarjetaJuego
+            key={juego._id}
+            juego={juego}
+            onEliminar={(id) =>
+              setJuegos(prevJuegos =>
+                prevJuegos.filter(j => j._id !== id)
+              )
+            }
+          />
         ))}
       </div>
     </div>
