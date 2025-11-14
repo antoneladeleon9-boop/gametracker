@@ -5,37 +5,19 @@ export default function Login() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mensaje, setMensaje] = useState("");
 
-  const handleSubmit = async (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault();
-    setMensaje("");
+    const ok = await login(email, password);
 
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        login({ email }, data.token);
-        setMensaje("Inicio de sesión exitoso 🎮");
-      } else {
-        setMensaje(data.mensaje || "Error al iniciar sesión");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setMensaje("Error de conexión con el servidor");
-    }
+    if (ok) window.location.href = "/";
   };
 
   return (
-    <div className="auth-container">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
+    <div className="contenedor">
+      <h1>Iniciar Sesión</h1>
+
+      <form onSubmit={manejarSubmit} className="formulario-juego">
         <input
           type="email"
           placeholder="Correo electrónico"
@@ -43,6 +25,7 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Contraseña"
@@ -50,9 +33,14 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Ingresar</button>
+
+        <button type="submit">Iniciar Sesión</button>
       </form>
-      {mensaje && <p className="mensaje">{mensaje}</p>}
+
+      <p>
+        ¿No tenés cuenta?{" "}
+        <a href="/register" style={{ color: "#4caf50" }}>Registrarse</a>
+      </p>
     </div>
   );
 }

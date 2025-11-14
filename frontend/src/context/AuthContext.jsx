@@ -6,7 +6,7 @@ export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
 
-  // 🔹 Registrar nuevo usuario
+  // Registrar usuario
   const registrar = async (nombre, email, password) => {
     try {
       const res = await fetch("http://localhost:5000/api/auth/register", {
@@ -14,20 +14,16 @@ export function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, email, password }),
       });
-      const data = await res.json();
 
-      if (res.ok) {
-        alert("✅ Registro exitoso. Ahora podés iniciar sesión.");
-      } else {
-        alert(`❌ Error: ${data.mensaje || "No se pudo registrar."}`);
-      }
+      const data = await res.json();
+      return res.ok;
     } catch (error) {
       console.error("Error al registrar:", error);
-      alert("❌ Error de conexión con el servidor.");
+      return false;
     }
   };
 
-  // 🔹 Iniciar sesión
+  // Login usuario
   const login = async (email, password) => {
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
@@ -35,31 +31,32 @@ export function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
+      console.log("DATA LOGIN:", data);
 
       if (res.ok && data.token) {
-        setToken(data.token);
         localStorage.setItem("token", data.token);
-        setUsuario({ nombre: data.nombre });
-        alert("✅ Sesión iniciada correctamente.");
+        setToken(data.token);
+        setUsuario({ nombre: data.nombre || "Usuario" });
+        return true;
       } else {
-        alert(`❌ ${data.mensaje || "Error en las credenciales."}`);
+        alert(data.mensaje || "Credenciales incorrectas");
+        return false;
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      alert("❌ Error de conexión con el servidor.");
+      return false;
     }
   };
 
-  // 🔹 Cerrar sesión
   const logout = () => {
+    localStorage.removeItem("token");
     setUsuario(null);
     setToken("");
-    localStorage.removeItem("token");
-    alert("👋 Sesión cerrada.");
   };
 
-  // 🔹 Verificar si hay sesión activa al cargar
+  // Mantener login
   useEffect(() => {
     const tokenGuardado = localStorage.getItem("token");
     if (tokenGuardado) {
@@ -75,6 +72,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
