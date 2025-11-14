@@ -1,42 +1,24 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
+  const { registrar } = useAuth();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mensaje, setMensaje] = useState("");
 
-  const handleSubmit = async (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault();
-    setMensaje("");
+    const ok = await registrar(nombre, email, password);
 
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setMensaje("Usuario registrado con éxito ✅");
-        setNombre("");
-        setEmail("");
-        setPassword("");
-      } else {
-        setMensaje(data.mensaje || "Error al registrar usuario");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setMensaje("Error de conexión con el servidor");
-    }
+    if (ok) window.location.href = "/";
   };
 
   return (
-    <div className="auth-container">
-      <h2>Crear Cuenta</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
+    <div className="contenedor">
+      <h1>Registrarse</h1>
+
+      <form onSubmit={manejarSubmit} className="formulario-juego">
         <input
           type="text"
           placeholder="Nombre"
@@ -44,6 +26,7 @@ export default function Register() {
           onChange={(e) => setNombre(e.target.value)}
           required
         />
+
         <input
           type="email"
           placeholder="Correo electrónico"
@@ -51,6 +34,7 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Contraseña"
@@ -58,9 +42,14 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         <button type="submit">Registrarse</button>
       </form>
-      {mensaje && <p className="mensaje">{mensaje}</p>}
+
+      <p>
+        ¿Ya tenés cuenta?{" "}
+        <a href="/" style={{ color: "#4caf50" }}>Iniciar sesión</a>
+      </p>
     </div>
   );
 }
